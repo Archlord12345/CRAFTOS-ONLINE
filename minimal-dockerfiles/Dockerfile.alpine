@@ -1,0 +1,26 @@
+FROM alpine:latest
+
+# Installer les utilitaires essentiels
+RUN apk add --no-cache \
+    bash \
+    python3 \
+    py3-pip \
+    curl \
+    wget \
+    nano \
+    && rm -rf /var/cache/apk/*
+
+# Installer les dépendances Python
+RUN pip3 install --no-cache-dir flask rich colorama
+
+# Créer le répertoire de travail
+WORKDIR /app
+
+# Copier l'application
+COPY web_app.py .
+
+# Exposer le port
+EXPOSE 8000
+
+# Lancer l'application
+CMD ["python3", "web_app.py"]
