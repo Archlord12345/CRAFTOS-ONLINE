@@ -13,11 +13,15 @@ RUN apk add --no-cache \
 # Installer les dépendances Python
 RUN pip3 install --no-cache-dir flask rich colorama
 
+# Créer un utilisateur non-root pour la sécurité
+RUN adduser -D -s /bin/bash neonuser
+USER neonuser
+
 # Créer le répertoire de travail
 WORKDIR /app
 
 # Copier l'application
-COPY web_app.py .
+COPY --chown=neonuser:neonuser web_app.py .
 
 # Exposer le port
 EXPOSE 8000

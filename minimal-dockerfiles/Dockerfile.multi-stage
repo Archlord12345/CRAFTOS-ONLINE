@@ -1,0 +1,37 @@
+# Stage 1: Builder
+FROM python:3.11-alpine AS builder
+
+# Installer les dépendances de build
+RUN apk add --no-cache gcc musl-dev
+
+# Copier les requirements et installer les dépendances
+COPY requirements.txt .
+RUN pip3 install --no-cache-dir -r requirements.txt --target /install
+
+# Stage 2: Runtime
+FROM alpine:latest
+
+# Installer uniquement les runtime nécessaires
+RUN apk add --no-cache \
+    bash \
+    curl \
+    && rm -rf /var/cache/apk/*
+
+# Copier les dépendances Python depuis le builder
+COPY --from=builder /install /usr/local/lib/python3.11/site-packages
+
+# Créer un utilisateur non-root
+RUN adduser -D -s /bin/sh neonuser
+USER neonuser
+
+# Créer le répertoire de travail
+WORKDIR /app
+
+# Copier l'application
+COPY --chown=neonuser:neonuser web_app.py .
+
+# Exposer le port
+EXPOSE 8000
+
+# Lancer l'application
+CMD ["python3", "web_app.py"]

@@ -1,27 +1,47 @@
 services:
-  # Service Web pour NEON OS
+  # Service Web principal pour NEON OS avec Alpine optimisé
   - type: web
     name: neon-os
     env: docker
     repo: https://github.com/Archlord12345/CRAFTOS-ONLINE
     rootDir: .
-    dockerfilePath: ./Dockerfile
-    dockerContext: .    
+    dockerfilePath: ./minimal-dockerfiles/Dockerfile.alpine
+    dockerContext: .
     plan: free
     healthCheckPath: /
+    autoDeploy: true
     envVars:
       - key: PYTHONUNBUFFERED
         value: 1
-      - key: TERM
-        value: xterm-256color
+      - key: PORT
+        value: 8000
+      - key: PYTHONPATH
+        value: /app
 
-  # Service pour le terminal interactif
+  # Service de backup avec Debian Slim
+  - type: web
+    name: neon-os-backup
+    env: docker
+    repo: https://github.com/Archlord12345/CRAFTOS-ONLINE
+    rootDir: .
+    dockerfilePath: ./minimal-dockerfiles/Dockerfile.slim
+    dockerContext: .
+    plan: free
+    healthCheckPath: /
+    autoDeploy: false
+    envVars:
+      - key: PYTHONUNBUFFERED
+        value: 1
+      - key: PORT
+        value: 8000
+
+  # Service terminal optionnel
   - type: pserv
     name: neon-os-terminal
     env: docker
     repo: https://github.com/Archlord12345/CRAFTOS-ONLINE
     rootDir: .
-    dockerfilePath: ./Dockerfile.terminal
+    dockerfilePath: ./minimal-dockerfiles/Dockerfile.multi-stage
     dockerContext: .
     plan: free
     envVars:

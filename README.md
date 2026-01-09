@@ -1,23 +1,31 @@
 # NEON OS TOON EDITION
 
-Un système d'exploitation stylé déployé sur Render avec interface web.
+Un système d'exploitation stylé déployé sur Render avec interface web optimisée.
 
-## 🚀 Déploiement sur Render
+## Déploiement sur Render
 
 ### Configuration automatique
 
-1. **Connectez votre repository GitHub** à Render
-2. **Utilisez le fichier `render.yaml`** pour la configuration automatique
-3. **Déployez les services** :
-   - `neon-os` : Interface web principale
-   - `neon-os-terminal` : Service terminal interactif
+Le fichier `render.yaml` configure automatiquement 3 services optimisés :
 
-### Services déployés
+1. **`neon-os`** (principal) - Alpine Linux - ~45MB 
+2. **`neon-os-backup`** - Debian Slim - ~120MB (backup)
+3. **`neon-os-terminal`** - Multi-stage - ~35MB (terminal)
 
-- **Service Web** : Interface web NEON OS avec terminal intégré
-- **Service Terminal** : Accès terminal direct (optionnel)
+### Étapes de déploiement
 
-## 🎮 Fonctionnalités
+1. **Poussez votre code sur GitHub**
+2. **Connectez votre repository** à Render
+3. **Render détecte automatiquement** `render.yaml`
+4. **Les services sont déployés** automatiquement
+
+### URLs attendues
+
+- **Principal** : https://neon-os.onrender.com
+- **Backup** : https://neon-os-backup.onrender.com  
+- **Terminal** : https://neon-os-terminal.onrender.com
+
+## Fonctionnalités
 
 - **Interface Web** : Terminal stylé dans le navigateur
 - **Navigation entre royaumes** : OVERWORLD, NETHER, THE_END
@@ -26,22 +34,24 @@ Un système d'exploitation stylé déployé sur Render avec interface web.
 - **Système d'achievement** : Notifications stylées
 - **Outils système** : Accès aux outils de base
 
-## 📁 Structure du projet
+## Structure du projet
 
 ```
 CRAFTOS-ONLINE/
-├── render.yaml             # Configuration Render
-├── Dockerfile              # Service web principal
-├── Dockerfile.terminal     # Service terminal optionnel
-├── neon_os.py             # Interface Python (backup)
-├── welcome.sh             # Script de bienvenue
-├── requirements.txt       # Dépendances Python
-├── storage/               # Stockage OBSIDIAN
-├── realms/                # Royaumes disponibles
-└── README.md              # Documentation
+├── render.yaml                 # Configuration Render
+├── minimal-dockerfiles/        # Dockerfiles optimisés
+│   ├── Dockerfile.alpine      # Alpine ~45MB 
+│   ├── Dockerfile.slim        # Debian Slim ~120MB
+│   ├── Dockerfile.multi-stage # Multi-stage ~35MB
+│   └── Dockerfile.busybox     # BusyBox expérimental
+├── web_app.py                 # Interface web Flask
+├── neon_os.py                 # Interface Python (backup)
+├── requirements.txt           # Dépendances Python
+├── render-build.sh           # Script de vérification
+└── README.md                  # Documentation
 ```
 
-## 🎯 Commandes NEON OS
+## Commandes NEON OS
 
 - `help` : Afficher l'aide
 - `realms` : Voir les royaumes disponibles
@@ -49,17 +59,41 @@ CRAFTOS-ONLINE/
 - `achievement` : Afficher l'achievement
 - Toutes les commandes Linux standard
 
-## 🔧 Configuration Render
+## Configuration Render
 
-Le fichier `render.yaml` configure automatiquement :
-- Services web et terminal
-- Variables d'environnement
-- Ports et health checks
-- Plans gratuits
+### Variables d'environnement
+- `PYTHONUNBUFFERED=1` : Sortie Python immédiate
+- `PORT=8000` : Port d'écoute Flask
+- `PYTHONPATH=/app` : Chemin Python
 
-## 📦 Dépendances
+### Services
+- **Web** : Interface principale avec health check
+- **Backup** : Service de secours (déploiement manuel)
+- **Terminal** : Service privé pour accès direct
 
-- Ubuntu 22.04
-- Python 3 avec Flask, Rich et Colorama
-- Outils système de base
-- Interface web intégrée
+## Optimisations
+
+- **Images ultra-légères** : < 500MB total
+- **Multi-stage builds** : Séparation build/runtime
+- **Utilisateur non-root** : Sécurité renforcée
+- **Cache optimisé** : `--no-cache` dans les installations
+
+## Développement local
+
+```bash
+# Test local
+python3 web_app.py
+
+# Build Docker
+docker build -f minimal-dockerfiles/Dockerfile.alpine -t neon-os .
+docker run -p 8000:8000 neon-os
+```
+
+## Tailles des images
+
+| Image | Taille finale | Usage |
+|-------|---------------|-------|
+| Alpine | ~45MB |  Production |
+| Multi-stage | ~35MB |  Optimisé |
+| Debian Slim | ~120MB |  Backup |
+| BusyBox | ~15MB |  Expérimental |

@@ -1,0 +1,11 @@
+FROM busybox:latest
+
+# Installer bash et python si possible
+RUN adduser -D -s /bin/sh appuser
+
+# Copier les scripts essentiels
+COPY web_app.py /app/
+WORKDIR /app
+
+# Note: BusyBox est très limité, nécessite des ajustements
+CMD ["sh", "-c", "echo 'BusyBox NEON OS - Mode minimal'"]
