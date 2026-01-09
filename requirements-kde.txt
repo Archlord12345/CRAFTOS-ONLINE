@@ -1,0 +1,4 @@
+flask
+rich
+colorama
+PyQt5

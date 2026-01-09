@@ -18,6 +18,40 @@ services:
       - key: PYTHONPATH
         value: /app
 
+  # Service KDE avec interface graphique complète
+  - type: web
+    name: neon-os-kde
+    env: docker
+    repo: https://github.com/Archlord12345/CRAFTOS-ONLINE
+    rootDir: .
+    dockerfilePath: ./minimal-dockerfiles/Dockerfile.kde
+    dockerContext: .
+    plan: starter
+    healthCheckPath: /
+    autoDeploy: false
+    envVars:
+      - key: PYTHONUNBUFFERED
+        value: 1
+      - key: DISPLAY
+        value: :99
+      - key: QT_QPA_PLATFORM
+        value: offscreen
+
+  # Service VNC pour accès bureau distant
+  - type: pserv
+    name: neon-os-vnc
+    env: docker
+    repo: https://github.com/Archlord12345/CRAFTOS-ONLINE
+    rootDir: .
+    dockerfilePath: ./minimal-dockerfiles/Dockerfile.kde
+    dockerContext: .
+    plan: starter
+    envVars:
+      - key: PYTHONUNBUFFERED
+        value: 1
+      - key: DISPLAY
+        value: :99
+
   # Service de backup avec Debian Slim
   - type: web
     name: neon-os-backup
@@ -34,16 +68,3 @@ services:
         value: 1
       - key: PORT
         value: 8000
-
-  # Service terminal optionnel
-  - type: pserv
-    name: neon-os-terminal
-    env: docker
-    repo: https://github.com/Archlord12345/CRAFTOS-ONLINE
-    rootDir: .
-    dockerfilePath: ./minimal-dockerfiles/Dockerfile.multi-stage
-    dockerContext: .
-    plan: free
-    envVars:
-      - key: PYTHONUNBUFFERED
-        value: 1
