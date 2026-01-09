@@ -1,0 +1,29 @@
+services:
+  # Service Web pour NEON OS
+  - type: web
+    name: neon-os
+    env: docker
+    repo: https://github.com/Archlord12345/CRAFTOS-ONLINE
+    rootDir: .
+    dockerfilePath: ./Dockerfile
+    dockerContext: .    
+    plan: free
+    healthCheckPath: /
+    envVars:
+      - key: PYTHONUNBUFFERED
+        value: 1
+      - key: TERM
+        value: xterm-256color
+
+  # Service pour le terminal interactif
+  - type: pserv
+    name: neon-os-terminal
+    env: docker
+    repo: https://github.com/Archlord12345/CRAFTOS-ONLINE
+    rootDir: .
+    dockerfilePath: ./Dockerfile.terminal
+    dockerContext: .
+    plan: free
+    envVars:
+      - key: PYTHONUNBUFFERED
+        value: 1

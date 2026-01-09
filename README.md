@@ -1,46 +1,41 @@
 # NEON OS TOON EDITION
 
-Un système d'exploitation stylé dans un conteneur Docker inspiré de l'interface montrée.
+Un système d'exploitation stylé déployé sur Render avec interface web.
 
-## 🚀 Démarrage rapide
+## 🚀 Déploiement sur Render
 
-### Construction et lancement du conteneur
+### Configuration automatique
 
-```bash
-# Construire l'image Docker
-docker build -t neon-os .
+1. **Connectez votre repository GitHub** à Render
+2. **Utilisez le fichier `render.yaml`** pour la configuration automatique
+3. **Déployez les services** :
+   - `neon-os` : Interface web principale
+   - `neon-os-terminal` : Service terminal interactif
 
-# Lancer le conteneur
-docker run -it --name neon-os-container neon-os
-```
+### Services déployés
 
-### Ou avec Docker Compose
-
-```bash
-# Lancer avec docker-compose
-docker-compose up --build
-
-# Arrêter
-docker-compose down
-```
+- **Service Web** : Interface web NEON OS avec terminal intégré
+- **Service Terminal** : Accès terminal direct (optionnel)
 
 ## 🎮 Fonctionnalités
 
-- **Interface NEON OS** : Interface stylée avec Rich Python
+- **Interface Web** : Terminal stylé dans le navigateur
 - **Navigation entre royaumes** : OVERWORLD, NETHER, THE_END
 - **Toon Realms** : SURVIVAL_V1, TOON_CITY, CREATIVE_X
-- **Exécution de commandes Linux** : Toutes les commandes Linux sont disponibles
+- **Exécution de commandes Linux** : Toutes les commandes Linux disponibles
 - **Système d'achievement** : Notifications stylées
 - **Outils système** : Accès aux outils de base
 
-## 📁 Structure
+## 📁 Structure du projet
 
 ```
-neon-os/
-├── Dockerfile              # Configuration Docker
-├── docker-compose.yml      # Configuration Docker Compose
-├── neon_os.py             # Interface principale Python
+CRAFTOS-ONLINE/
+├── render.yaml             # Configuration Render
+├── Dockerfile              # Service web principal
+├── Dockerfile.terminal     # Service terminal optionnel
+├── neon_os.py             # Interface Python (backup)
 ├── welcome.sh             # Script de bienvenue
+├── requirements.txt       # Dépendances Python
 ├── storage/               # Stockage OBSIDIAN
 ├── realms/                # Royaumes disponibles
 └── README.md              # Documentation
@@ -52,17 +47,19 @@ neon-os/
 - `realms` : Voir les royaumes disponibles
 - `tools` : Afficher les outils système
 - `achievement` : Afficher l'achievement
-- `cd <royaume>` : Changer de royaume
-- `exit/quit` : Quitter NEON OS
 - Toutes les commandes Linux standard
 
-## 🔧 Personnalisation
+## 🔧 Configuration Render
 
-Pour ajouter de nouveaux royaumes ou modifier l'interface, éditez `neon_os.py`.
+Le fichier `render.yaml` configure automatiquement :
+- Services web et terminal
+- Variables d'environnement
+- Ports et health checks
+- Plans gratuits
 
 ## 📦 Dépendances
 
 - Ubuntu 22.04
-- Python 3 avec Rich et Colorama
-- Figlet et Lolcat pour les effets stylés
+- Python 3 avec Flask, Rich et Colorama
 - Outils système de base
+- Interface web intégrée

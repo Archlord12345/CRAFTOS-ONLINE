@@ -23,7 +23,12 @@ class NeonOS:
         subtitle = Text("Linux Container Environment", style="cyan")
         
         console.print(Panel(
-            Align.center(title) + "\n" + Align.center(subtitle),
+            Align.center(title),
+            box.box.DOUBLE,
+            border_style="bright_blue"
+        ))
+        console.print(Panel(
+            Align.center(subtitle),
             box.box.DOUBLE,
             border_style="bright_blue"
         ))
