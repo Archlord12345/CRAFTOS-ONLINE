@@ -18,6 +18,46 @@ services:
       - key: PYTHONPATH
         value: /app
 
+  # Service Minecraft Bot avec interface web
+  - type: web
+    name: neon-os-minecraft-bot
+    env: docker
+    repo: https://github.com/Archlord12345/CRAFTOS-ONLINE
+    rootDir: .
+    dockerfilePath: ./minimal-dockerfiles/Dockerfile.minecraft
+    dockerContext: .
+    plan: starter
+    healthCheckPath: /
+    autoDeploy: false
+    envVars:
+      - key: PYTHONUNBUFFERED
+        value: 1
+      - key: PORT
+        value: 8000
+      - key: MINECRAFT_SERVER
+        value: "false"
+      - key: SERVER_HOST
+        value: "localhost"
+      - key: SERVER_PORT
+        value: "25565"
+
+  # Service Serveur Minecraft complet
+  - type: pserv
+    name: neon-os-minecraft-server
+    env: docker
+    repo: https://github.com/Archlord12345/CRAFTOS-ONLINE
+    rootDir: .
+    dockerfilePath: ./minimal-dockerfiles/Dockerfile.minecraft
+    dockerContext: .
+    plan: starter
+    envVars:
+      - key: PYTHONUNBUFFERED
+        value: 1
+      - key: MINECRAFT_SERVER
+        value: "true"
+      - key: SERVER_PORT
+        value: "25565"
+
   # Service VNC avec véritable KDE Plasma Desktop
   - type: pserv
     name: neon-os-kde-real
