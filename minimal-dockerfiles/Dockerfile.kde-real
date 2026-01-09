@@ -1,0 +1,125 @@
+FROM ubuntu:22.04
+
+# Éviter les prompts interactifs
+ENV DEBIAN_FRONTEND=noninteractive
+ENV DISPLAY=:1
+ENV DEPTH=24
+ENV GEOMETRY=1920x1080
+
+# Installer KDE Plasma Desktop complet et VNC
+RUN apt-get update && apt-get install -y \
+    # KDE Plasma Desktop complet
+    kde-plasma-desktop \
+    kde-standard \
+    plasma-workspace \
+    kwin \
+    plasma-desktop \
+    # Serveur VNC pour accès distant
+    tigervnc-standalone-server \
+    tigervnc-xorg-extension \
+    # Serveur X
+    xorg \
+    # Gestionnaire de connexion
+    sddm \
+    # Navigateur et applications
+    firefox \
+    kate \
+    dolphin \
+    konsole \
+    # Polices et thèmes
+    fonts-dejavu-core \
+    fonts-liberation \
+    # Outils système
+    python3 \
+    python3-pip \
+    curl \
+    wget \
+    nano \
+    vim \
+    htop \
+    tree \
+    # Nettoyage
+    && apt-get autoremove -y \
+    && apt-get autoclean \
+    && rm -rf /var/lib/apt/lists/*
+
+# Créer utilisateur KDE
+RUN useradd -m -s /bin/bash neonuser \
+    && echo "neonuser:neon123" | chpasswd \
+    && usermod -aG sudo neonuser
+
+# Configurer VNC
+RUN mkdir -p /home/neonuser/.vnc \
+    && chown neonuser:neonuser /home/neonuser/.vnc
+
+# Script de configuration VNC pour neonuser
+RUN echo '#!/bin/bash\n\
+export DISPLAY=:1\n\
+export XDG_RUNTIME_DIR=/tmp/runtime-neonuser\n\
+mkdir -p $XDG_RUNTIME_DIR\n\
+chmod 700 $XDG_RUNTIME_DIR\n\
+\n\
+# Démarrer le serveur X\n\
+Xvfb :1 -screen 0 ${GEOMETRY}x${DEPTH} &\n\
+sleep 2\n\
+\n\
+# Configurer KDE\n\
+export KDE_SESSION_VERSION=5\n\
+export XDG_CURRENT_DESKTOP=KDE\n\
+\n\
+# Démarrer KDE Plasma\n\
+/usr/bin/startplasma-x11 &' > /home/neonuser/.vnc/xstartup \
+    && chmod +x /home/neonuser/.vnc/xstartup \
+    && chown neonuser:neonuser /home/neonuser/.vnc/xstartup
+
+# Configurer le bureau KDE avec thème NEON
+RUN mkdir -p /home/neonuser/.config \
+    && chown neonuser:neonuser /home/neonuser/.config
+
+# Script de démarrage pour NEON OS KDE
+RUN echo '#!/bin/bash\n\
+echo "🚀 Démarrage de NEON OS KDE Plasma..."\n\
+\n\
+# Créer le runtime directory\n\
+mkdir -p /tmp/runtime-neonuser\n\
+chmod 700 /tmp/runtime-neonuser\n\
+chown neonuser:neonuser /tmp/runtime-neonuser\n\
+\n\
+# Démarrer VNC\n\
+su - neonuser -c "vncserver :1 -geometry ${GEOMETRY} -depth ${DEPTH} -localhost no"\n\
+\n\
+# Attendre que KDE soit prêt\n\
+sleep 5\n\
+\n\
+# Configurer le thème NEON\n\
+su - neonuser -c "mkdir -p ~/.local/share/plasma/look-and-feel"\n\
+su - neonuser -c "mkdir -p ~/.config"\n\
+\n\
+# Lancer les applications NEON OS\n\
+su - neonuser -c "python3 /app/neon_kde_tools.py &"\n\
+\n\
+echo "✅ NEON OS KDE Plasma est prêt!"\n\
+echo "🔗 Connectez-vous via VNC sur localhost:5901"\n\
+echo "👤 Utilisateur: neonuser"\n\
+echo "🔐 Mot de passe: neon123"\n\
+\n\
+# Garder le conteneur en cours d exécution\n\
+tail -f /dev/null' > /app/start_kde_real.sh \
+    && chmod +x /app/start_kde_real.sh
+
+# Créer le répertoire de travail
+WORKDIR /app
+
+# Copier les outils NEON pour KDE
+COPY neon_kde_tools.py /app/
+COPY kde_desktop_config.sh /app/
+
+# Donner les permissions
+RUN chown neonuser:neonuser /app/neon_kde_tools.py \
+    && chmod +x /app/kde_desktop_config.sh
+
+# Exposer le port VNC
+EXPOSE 5901
+
+# Démarrer KDE Plasma réel
+CMD ["/app/start_kde_real.sh"]
